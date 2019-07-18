@@ -1,26 +1,35 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Toolbar from './Components/Toolbar';
+import Messages from './Components/Messages'
+import { BrowserRouter as Router } from "react-router-dom";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+class App extends React.Component {
+  state ={
+    messages: []
+  }
+
+  async componentDidMount() {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/messages`);
+    const json = await response.json();
+    this.setState({
+      messages:json.map(message=> {
+        return {
+          ...message
+        }
+      })
+    })
+  }
+
+  render(){
+    return (
+      <Router>
+        <Toolbar />
+        <Messages />
+      </Router>
+
+    )
+  }
 }
 
 export default App;
