@@ -2,7 +2,6 @@ import React from 'react';
 import Body from './Body';
 
 function Message({ id, subject, read, selected, checkMessage, starred, starMessage, labels, body  }) {
-    console.log(labels)
     const isSelected = selected ? 'selected' : ''
     return (
         <div>

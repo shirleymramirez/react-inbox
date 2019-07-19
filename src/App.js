@@ -27,8 +27,8 @@ class App extends React.Component {
   }
 
   checkMessage = (id) => {
+    // If the message is selected, it should have the selected style and the box should be checked
     const newMessages = this.state.messages.map(message=> {
-      // If the message is selected, it should have the selected style and the box should be checked
       if(message.id === id) message.selected ? message.selected=false : message.selected=true
       return message
     })
@@ -53,19 +53,119 @@ class App extends React.Component {
     if(response) this.getAllMessages();
   }
 
+  readMessages = async () => {
+    // Users should be able to mark messages as read.
+    const messageIds = this.state.messages.filter(message => 
+      message.selected === true).map(message=> message.id)
+
+    const response = await fetch('http://localhost:8082/api/messages', {
+      method: "PATCH",
+      body: JSON.stringify({
+        command: 'read',
+        read: true,
+        messageIds: messageIds
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    if (response) this.getAllMessages();
+  }
+
+  unreadMessages = async() => {
+    const messageIds = this.state.messages.filter(message =>
+      message.selected === true).map(message => message.id)
+
+    const response = await fetch('http://localhost:8082/api/messages', {
+      method: "PATCH",
+      body: JSON.stringify({
+        command: 'read',
+        read: false,
+        messageIds: messageIds
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    if (response) this.getAllMessages();
+  }
+
+  selectedAll = () => {
+    const allMessages = this.state.messages.every(message=>message.selected === true)
+    const newMessages = this.state.messages.map(message=> {
+      allMessages ? message.selected = false : message.selected = true
+      return message
+    })
+    this.setState({
+      messages: newMessages
+    })
+  }
+
+  deleteMessage = async(id) => {
+    const messageIds = this.state.messages.filter(message =>
+      message.selected === true).map(message => message.id)
+
+    const response = await fetch('http://localhost:8082/api/messages', {
+      method: "PATCH",
+      body: JSON.stringify({
+        command: 'delete',
+        messageIds: messageIds
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    if (response) this.getAllMessages();
+  }
+
+  applyLabels = async (e) => {
+    const messageIds = this.state.messages.filter(message =>
+      message.selected === true).map(message => message.id)
+
+    const response = await fetch('http://localhost:8082/api/messages', {
+      method: "PATCH",
+      body: JSON.stringify({
+        command: 'addLabel',
+        messageIds: messageIds,
+        label: e.target.value
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    if (response) this.getAllMessages();
+  }
+
+  removeLabels = async (e) => {
+    const messageIds = this.state.messages.filter(message =>
+      message.selected === true).map(message => message.id)
+
+    const response = await fetch('http://localhost:8082/api/messages', {
+      method: "PATCH",
+      body: JSON.stringify({
+        command: 'removeLabel',
+        messageIds: messageIds,
+        label: e.target.value
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    if (response) this.getAllMessages();
+  }
+
 
   render(){
     return (
       <Router>
         <Toolbar 
-          allSelected={this.state.allSelected}
-          selectionButton={this.selectionButton}
-          markAsRead={this.markAsRead}
-          markAsUnread={this.markAsUnread}
-          applyLevel={this.applyLevel}
-          removeLevel={this.removeLevel}
-          trashButton={this.trashButton}
-          plusButton={this.plusButton}
+          readMessages={this.readMessages}
+          unreadMessages={this.unreadMessages}
+          selectedAll={this.selectedAll}
+          deleteMessage={this.deleteMessage}
+          applyLabels={this.applyLabels}
+          removeLabels={this.removeLabels}
+          messages={this.state.messages}
         />
         <Messages 
           messages={this.state.messages}
