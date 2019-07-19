@@ -6,11 +6,13 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 class App extends React.Component {
   state ={
-    messages: []
+    messages: [],
+    allSelected: true
   }
 
   async componentDidMount() {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/messages`);
+    // const response = await fetch(`${process.env.REACT_APP_API_URL}/messages`);
+    const response = await fetch('http://localhost:8082/api/messages');
     const json = await response.json();
     this.setState({
       messages:json.map(message=> {
@@ -21,11 +23,25 @@ class App extends React.Component {
     })
   }
 
+
+
   render(){
+    console.log(this.state.messages);
     return (
       <Router>
-        <Toolbar />
-        <Messages />
+        <Toolbar 
+          allSelected={this.state.allSelected}
+          checkBox={this.checkbox}
+          markAsRead={this.markAsRead}
+          markAsUnread={this.markAsUnread}
+          applyLevel={this.applyLevel}
+          removeLevel={this.removeLevel}
+          trashButton={this.trashButton}
+          plusButton={this.plusButton}
+        />
+        <Messages 
+          messages={this.state.messages}
+        />
       </Router>
 
     )
