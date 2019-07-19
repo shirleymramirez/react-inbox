@@ -1,12 +1,13 @@
-import React from 'react';
-import Toolbar from './Components/Toolbar';
+import React from 'react'
+import Toolbar from './Components/Toolbar'
+import Compose from './Components/Compose'
 import Messages from './Components/Messages'
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom"
 
 class App extends React.Component {
   state ={
     messages: [],
-    allSelected: true
+    compose: false
   }
 
   componentDidMount() {
@@ -54,7 +55,6 @@ class App extends React.Component {
   }
 
   readMessages = async () => {
-    // Users should be able to mark messages as read.
     const messageIds = this.state.messages.filter(message => 
       message.selected === true).map(message=> message.id)
 
@@ -154,6 +154,28 @@ class App extends React.Component {
     if (response) this.getAllMessages();
   }
 
+  createMessage = async({body, subject}) => {
+    const response = await fetch('http://localhost:8082/api/messages', {
+      method: "POST",
+      body:JSON.stringify({
+        subject,
+        body
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    console.log(response, "response");
+    if (response) this.getAllMessages();
+    this.toggleCompose();
+  }
+
+  toggleCompose = () => {
+    this.setState({
+      compose: !this.state.compose
+    })
+  }
+
 
   render(){
     return (
@@ -166,7 +188,9 @@ class App extends React.Component {
           applyLabels={this.applyLabels}
           removeLabels={this.removeLabels}
           messages={this.state.messages}
+          toggleCompose={this.toggleCompose}
         />
+        {this.state.compose ? <Compose createMessage={this.createMessage} /> : ''}
         <Messages 
           messages={this.state.messages}
           checkMessage={this.checkMessage}
