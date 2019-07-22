@@ -15,7 +15,7 @@ class App extends React.Component {
   }
 
   getAllMessages = async () => {
-    // const response = await fetch(`${process.env.REACT_APP_API_URL}/messages`);
+    // const response = await fetch(`${process.env.REACT_APP_API_URL}/api/messages`);
     const response = await fetch('http://localhost:8082/api/messages');
     const json = await response.json();
     this.setState({
@@ -165,7 +165,6 @@ class App extends React.Component {
         'Content-Type': 'application/json'
       }
     })
-    console.log(response, "response");
     if (response) this.getAllMessages();
     this.toggleCompose();
   }
